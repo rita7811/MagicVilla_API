@@ -5,6 +5,7 @@ using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
 using MagicVilla_VillaAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +18,15 @@ namespace MagicVilla_VillaAPI.Controllers
 	{
         protected APIResponse _response;
         private readonly IVillaNumberRepository _dbVillaNumber;
+        private readonly IVillaRepository _dbVilla;
         private readonly IMapper _mapper;
 
-        public VillaNumberAPIController(IVillaNumberRepository dbVillaNumber, IMapper mapper)
+        public VillaNumberAPIController(IVillaNumberRepository dbVillaNumber, IMapper mapper, IVillaRepository dbVilla)
         {
             _dbVillaNumber = dbVillaNumber;
             _mapper = mapper;
             this._response = new();
+            _dbVilla = dbVilla;
         }
 
 
@@ -97,6 +100,12 @@ namespace MagicVilla_VillaAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
+                if (await _dbVilla.GetAsync(n => n.Id == createDTO.VillaId) == null)
+                {
+                    ModelState.AddModelError("CustomError", "Villa ID is Invalid!");
+                    return BadRequest(ModelState);
+                }
+
                 if (createDTO == null)
                 {
                     return BadRequest(createDTO);
@@ -163,6 +172,12 @@ namespace MagicVilla_VillaAPI.Controllers
                 if (id != updateDTO.VillaNo || updateDTO == null)
                 {
                     return BadRequest();
+                }
+
+                if (await _dbVilla.GetAsync(n => n.Id == updateDTO.VillaId) == null)
+                {
+                    ModelState.AddModelError("CustomError", "Villa ID is Invalid!");
+                    return BadRequest(ModelState);
                 }
 
                 VillaNumber model = _mapper.Map<VillaNumber>(updateDTO);
