@@ -11,12 +11,12 @@ namespace MagicVilla_Web.Controllers
 	public class VillaController : Controller
 	{
 		private readonly IVillaService _villaService;
-		private readonly IMapper _mapping;
+		private readonly IMapper _mapper;
 
-        public VillaController(IVillaService villaService, IMapper mapping)
+        public VillaController(IVillaService villaService, IMapper mapper)
         {
             _villaService = villaService;
-            _mapping = mapping;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> IndexVilla()
